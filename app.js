@@ -186,7 +186,8 @@ function searchRoundTrips() {
   patterns.sort((a, b) => b.distance - a.distance || a.out.depMinutes - b.out.depMinutes);
 
   const depStr = departAfterVal === 'now' ? minutesToTime(departAfterMinutes) : departAfterVal;
-  let html = `<div class="result-summary">${aName}発 ${depStr}〜${returnLimitSelect.value}：${patterns.length}件</div>`;
+  const uniqueDestinations = [...new Set(patterns.map(p => p.bName))];
+  let html = `<div class="result-summary">${aName}発 ${depStr}〜${returnLimitSelect.value}：${patterns.length}件<br>行き先: ${uniqueDestinations.join('、')}</div>`;
 
   patterns.forEach((p, i) => {
     const stayH = Math.floor(p.stayMinutes / 60);
