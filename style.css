@@ -1,0 +1,199 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  background: #2e7d32;
+  color: #fff;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.4rem;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 0.2rem;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.search-panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+select, input[type="number"] {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  appearance: auto;
+}
+
+.station-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.station-row .form-group {
+  flex: 1;
+}
+
+.station-row .arrow {
+  font-size: 1.4rem;
+  padding-bottom: 0.7rem;
+  color: #2e7d32;
+  flex-shrink: 0;
+}
+
+#search-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#search-btn:hover {
+  background: #1b5e20;
+}
+
+.results {
+  margin-top: 1rem;
+}
+
+.result-summary {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-left: 4px solid #2e7d32;
+}
+
+.result-card .pattern-number {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.4rem;
+}
+
+.result-card .trip-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.result-card .trip-section .time {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2e7d32;
+}
+
+.result-card .trip-section .station {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.result-card .trip-section .train-info {
+  font-size: 0.75rem;
+  color: #999;
+  margin-left: auto;
+}
+
+.result-card .separator {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.8rem;
+  margin: 0.3rem 0;
+}
+
+.result-card .stay-info {
+  background: #e8f5e9;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.result-card .total-time {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: right;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+footer {
+  max-width: 640px;
+  margin: 1rem auto 2rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  color: #999;
+  text-align: center;
+}
+
+footer a {
+  color: #2e7d32;
+}

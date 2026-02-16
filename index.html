@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大井川鐵道 往復時刻表</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>大井川鐵道 往復時刻表</h1>
+    <p class="subtitle">往復旅行パターンを検索</p>
+  </header>
+
+  <main>
+    <section class="search-panel">
+      <div class="form-group">
+        <label for="line-select">路線</label>
+        <select id="line-select">
+          <option value="main">大井川本線</option>
+          <option value="ikawa">井川線</option>
+        </select>
+      </div>
+
+      <div class="station-row">
+        <div class="form-group">
+          <label for="station-a">出発駅（A駅）</label>
+          <select id="station-a"></select>
+        </div>
+        <span class="arrow">⇄</span>
+        <div class="form-group">
+          <label for="station-b">目的駅（B駅）</label>
+          <select id="station-b"></select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="min-stay">B駅での最低滞在時間（分）</label>
+        <input type="number" id="min-stay" value="30" min="0" step="10">
+      </div>
+
+      <button id="search-btn">検索</button>
+    </section>
+
+    <section id="results" class="results"></section>
+  </main>
+
+  <footer>
+    <p>時刻表データは<a href="https://daitetsu.jp/" target="_blank" rel="noopener">大井川鐵道公式サイト</a>を参照しています。最新の運行情報は公式サイトをご確認ください。</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

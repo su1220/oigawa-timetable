@@ -1,0 +1,72 @@
+{
+  "line": "大井川本線",
+  "direction": "down",
+  "stations": ["金谷", "新金谷", "代官町", "日切", "合格", "門出", "神尾", "福用", "大和田", "家山", "抜里", "川根温泉笹間渡"],
+  "trains": [
+    {
+      "trainNumber": "41",
+      "type": "普通",
+      "times": ["07:24", "07:28", "07:31", "07:33", "07:35", "07:37", "07:43", "07:48", "07:52", "07:56", null, null]
+    },
+    {
+      "trainNumber": "81",
+      "type": "普通",
+      "times": ["08:53", "08:57", null, null, null, null, null, null, null, null, null, null]
+    },
+    {
+      "trainNumber": "1001",
+      "type": "急行",
+      "times": ["10:00", "10:10", null, null, null, null, null, null, null, "10:42", null, "10:49"]
+    },
+    {
+      "trainNumber": "1",
+      "type": "普通",
+      "times": ["11:05", "11:10", "11:12", "11:14", "11:16", "11:18", "11:27", "11:31", "11:36", "11:44", "11:48", "11:50"]
+    },
+    {
+      "trainNumber": "101",
+      "type": "急行",
+      "times": ["12:00", "12:11", null, null, null, null, null, null, null, "12:54", null, "13:01"]
+    },
+    {
+      "trainNumber": "83",
+      "type": "普通",
+      "times": ["13:01", "13:04", null, null, null, null, null, null, null, null, null, null]
+    },
+    {
+      "trainNumber": "3",
+      "type": "普通",
+      "times": ["14:35", "14:41", "14:43", "14:45", "14:49", "14:51", "14:58", "15:02", "15:07", "15:12", "15:15", "15:18"]
+    },
+    {
+      "trainNumber": "103",
+      "type": "急行",
+      "times": ["15:00", "15:11", null, null, null, null, null, null, null, "15:43", null, "15:51"]
+    },
+    {
+      "trainNumber": "85",
+      "type": "普通",
+      "times": ["16:26", "16:30", null, null, null, null, null, null, null, null, null, null]
+    },
+    {
+      "trainNumber": "803",
+      "type": "普通",
+      "times": ["17:07", "17:11", null, null, null, null, null, null, null, null, null, null]
+    },
+    {
+      "trainNumber": "5",
+      "type": "普通",
+      "times": ["17:46", "17:51", "17:53", "17:55", "17:57", "17:59", "18:07", "18:12", "18:18", "18:23", "18:27", "18:30"]
+    },
+    {
+      "trainNumber": "43",
+      "type": "普通",
+      "times": ["19:40", "19:44", "19:47", "19:49", "19:51", "19:53", "20:01", "20:06", "20:11", "20:16", null, null]
+    },
+    {
+      "trainNumber": "87",
+      "type": "普通",
+      "times": ["21:12", "21:16", null, null, null, null, null, null, null, null, null, null]
+    }
+  ]
+}
