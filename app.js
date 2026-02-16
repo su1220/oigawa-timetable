@@ -56,6 +56,7 @@ async function loadAllData() {
 
 const lineSelect = document.getElementById('line-select');
 const stationA = document.getElementById('station-a');
+const departAfterSelect = document.getElementById('depart-after');
 const returnLimitSelect = document.getElementById('return-limit');
 const searchBtn = document.getElementById('search-btn');
 const resultsDiv = document.getElementById('results');
@@ -75,15 +76,21 @@ function populateStations() {
   stationA.value = 0;
 }
 
-function populateReturnLimit() {
+function populateTimeSelects() {
+  departAfterSelect.innerHTML = '';
   returnLimitSelect.innerHTML = '';
-  for (let h = 10; h <= 21; h++) {
+
+  departAfterSelect.appendChild(new Option('現在時刻', 'now'));
+  for (let h = 6; h <= 20; h++) {
     for (const m of ['00', '30']) {
       const label = `${h}:${m}`;
+      departAfterSelect.appendChild(new Option(label, label));
       returnLimitSelect.appendChild(new Option(label, label));
     }
   }
-  // Default: 17:00
+  returnLimitSelect.appendChild(new Option('21:00', '21:00'));
+
+  departAfterSelect.value = 'now';
   returnLimitSelect.value = '17:00';
 }
 
@@ -129,7 +136,8 @@ function searchRoundTrips() {
   const line = lineSelect.value;
   const aIdx = parseInt(stationA.value);
   const limitMinutes = timeToMinutes(returnLimitSelect.value);
-  const nowMinutes = getNowMinutes();
+  const departAfterVal = departAfterSelect.value;
+  const departAfterMinutes = departAfterVal === 'now' ? getNowMinutes() : timeToMinutes(departAfterVal);
   const downStations = getDownStations(line);
   const aName = downStations[aIdx];
 
@@ -149,7 +157,7 @@ function searchRoundTrips() {
     const returnTrips = findTrains(line, bIdx, aIdx);
 
     for (const out of outbound) {
-      if (out.depMinutes < nowMinutes) continue;
+      if (out.depMinutes < departAfterMinutes) continue;
 
       for (const ret of returnTrips) {
         const stayMinutes = ret.depMinutes - out.arrMinutes;
@@ -177,8 +185,8 @@ function searchRoundTrips() {
   // Sort: farthest destination first, then earliest departure
   patterns.sort((a, b) => b.distance - a.distance || a.out.depMinutes - b.out.depMinutes);
 
-  const nowStr = minutesToTime(nowMinutes);
-  let html = `<div class="result-summary">${aName}発 → ${returnLimitSelect.value}までに帰着：${patterns.length}件（${nowStr}以降）</div>`;
+  const depStr = departAfterVal === 'now' ? minutesToTime(departAfterMinutes) : departAfterVal;
+  let html = `<div class="result-summary">${aName}発 ${depStr}〜${returnLimitSelect.value}：${patterns.length}件</div>`;
 
   patterns.forEach((p, i) => {
     const stayH = Math.floor(p.stayMinutes / 60);
@@ -227,5 +235,5 @@ searchBtn.addEventListener('click', searchRoundTrips);
 
 loadAllData().then(() => {
   populateStations();
-  populateReturnLimit();
+  populateTimeSelects();
 });
