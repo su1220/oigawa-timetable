@@ -9,7 +9,7 @@ const DATA_FILES = {
   }
 };
 
-const MIN_STAY = 10;
+const MIN_STAY = 5;
 let timetableData = {};
 
 // --- Utility ---
