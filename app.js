@@ -24,6 +24,11 @@ function minutesToTime(min) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
+function getNowMinutes() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+}
+
 // --- Data Loading ---
 
 async function loadJSON(url) {
@@ -180,9 +185,12 @@ function searchRoundTrips() {
     return;
   }
 
+  const nowMinutes = getNowMinutes();
   const patterns = [];
 
   for (const out of outbound) {
+    if (out.depMinutes < nowMinutes) continue;
+
     for (const ret of returnTrips) {
       const stayMinutes = ret.depMinutes - out.arrMinutes;
       if (stayMinutes < minStay) continue;
@@ -202,7 +210,8 @@ function searchRoundTrips() {
   // Sort by outbound departure, then by stay time
   patterns.sort((a, b) => a.out.depMinutes - b.out.depMinutes || a.stayMinutes - b.stayMinutes);
 
-  let html = `<div class="result-summary">${aName} ⇄ ${bName}：${patterns.length}件の往復パターン</div>`;
+  const nowStr = minutesToTime(nowMinutes);
+  let html = `<div class="result-summary">${aName} ⇄ ${bName}：${patterns.length}件の往復パターン（${nowStr}以降）</div>`;
 
   patterns.forEach((p, i) => {
     const stayH = Math.floor(p.stayMinutes / 60);
