@@ -29,7 +29,7 @@ header h1 {
 }
 
 main {
-  max-width: 640px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 1rem;
 }
@@ -80,9 +80,115 @@ select {
   background: #1b5e20;
 }
 
-.results {
+/* --- Content area: results + route map --- */
+
+.content-area {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
   margin-top: 1rem;
 }
+
+.results {
+  flex: 1;
+  min-width: 0;
+}
+
+.route-map {
+  width: 140px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.8rem 0.6rem 0.8rem 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: none;
+}
+
+.route-map.visible {
+  display: block;
+}
+
+.route-map-title {
+  font-size: 0.7rem;
+  color: #888;
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+.route-map-station {
+  position: relative;
+  padding-left: 1.1rem;
+  padding-bottom: 0.15rem;
+  padding-top: 0.15rem;
+  font-size: 0.72rem;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+/* vertical line */
+.route-map-station::before {
+  content: '';
+  position: absolute;
+  left: 0.3rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ccc;
+}
+
+.route-map-station:first-of-type::before {
+  top: 50%;
+}
+
+.route-map-station:last-of-type::before {
+  bottom: 50%;
+}
+
+/* station dot */
+.route-map-station::after {
+  content: '';
+  position: absolute;
+  left: 0.05rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ccc;
+  border: 1.5px solid #ccc;
+}
+
+/* origin station */
+.route-map-station.origin {
+  color: #333;
+  font-weight: 700;
+}
+
+.route-map-station.origin::after {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  width: 9px;
+  height: 9px;
+  left: -0.01rem;
+}
+
+/* reachable station */
+.route-map-station.reachable {
+  color: #e65100;
+  font-weight: 600;
+}
+
+.route-map-station.reachable::after {
+  background: #e65100;
+  border-color: #e65100;
+  width: 9px;
+  height: 9px;
+  left: -0.01rem;
+}
+
+/* --- Result cards --- */
 
 .result-summary {
   background: #fff;
@@ -169,7 +275,7 @@ select {
 }
 
 footer {
-  max-width: 640px;
+  max-width: 900px;
   margin: 1rem auto 2rem;
   padding: 0 1rem;
   font-size: 0.75rem;
@@ -179,4 +285,58 @@ footer {
 
 footer a {
   color: #2e7d32;
+}
+
+/* --- Mobile --- */
+
+@media (max-width: 600px) {
+  .content-area {
+    flex-direction: column-reverse;
+  }
+
+  .route-map {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .route-map.visible {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.8rem;
+    align-items: center;
+  }
+
+  .route-map-title {
+    width: 100%;
+    margin-bottom: 0.2rem;
+  }
+
+  .route-map-station {
+    padding-left: 0.9rem;
+    padding-bottom: 0;
+    padding-top: 0;
+    font-size: 0.68rem;
+  }
+
+  .route-map-station::before {
+    display: none;
+  }
+
+  .route-map-station::after {
+    width: 6px;
+    height: 6px;
+    left: 0;
+  }
+
+  .route-map-station.origin::after,
+  .route-map-station.reachable::after {
+    width: 8px;
+    height: 8px;
+    left: -0.03rem;
+  }
 }

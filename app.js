@@ -60,6 +60,7 @@ const departAfterSelect = document.getElementById('depart-after');
 const returnLimitSelect = document.getElementById('return-limit');
 const searchBtn = document.getElementById('search-btn');
 const resultsDiv = document.getElementById('results');
+const routeMapDiv = document.getElementById('route-map');
 
 function getDownStations(line) {
   return timetableData[line].down.stations;
@@ -97,7 +98,27 @@ function populateTimeSelects() {
 lineSelect.addEventListener('change', () => {
   populateStations();
   resultsDiv.innerHTML = '';
+  routeMapDiv.classList.remove('visible');
 });
+
+// --- Route Map ---
+
+function updateRouteMap(line, originIdx, reachableNames) {
+  const stations = getDownStations(line);
+  const reachableSet = new Set(reachableNames);
+  const lineName = line === 'main' ? '大井川本線' : '井川線';
+
+  let html = `<div class="route-map-title">${lineName}</div>`;
+  stations.forEach((s, i) => {
+    let cls = 'route-map-station';
+    if (i === originIdx) cls += ' origin';
+    else if (reachableSet.has(s)) cls += ' reachable';
+    html += `<div class="${cls}">${s}</div>`;
+  });
+
+  routeMapDiv.innerHTML = html;
+  routeMapDiv.classList.add('visible');
+}
 
 // --- Search Logic ---
 
@@ -179,6 +200,7 @@ function searchRoundTrips() {
 
   if (patterns.length === 0) {
     resultsDiv.innerHTML = '<p class="no-results">条件に合う往復パターンが見つかりません。帰着リミットを遅くしてみてください。</p>';
+    updateRouteMap(line, aIdx, []);
     return;
   }
 
@@ -187,6 +209,7 @@ function searchRoundTrips() {
 
   const depStr = departAfterVal === 'now' ? minutesToTime(departAfterMinutes) : departAfterVal;
   const uniqueDestinations = [...new Set(patterns.map(p => p.bName))];
+  updateRouteMap(line, aIdx, uniqueDestinations);
   let html = `<div class="result-summary">${aName}発 ${depStr}〜${returnLimitSelect.value}：${patterns.length}件<br>行き先: ${uniqueDestinations.join('、')}</div>`;
 
   patterns.forEach((p, i) => {
