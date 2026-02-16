@@ -9,6 +9,7 @@ const DATA_FILES = {
   }
 };
 
+const MIN_STAY = 10;
 let timetableData = {};
 
 // --- Utility ---
@@ -55,8 +56,7 @@ async function loadAllData() {
 
 const lineSelect = document.getElementById('line-select');
 const stationA = document.getElementById('station-a');
-const stationB = document.getElementById('station-b');
-const minStayInput = document.getElementById('min-stay');
+const returnLimitSelect = document.getElementById('return-limit');
 const searchBtn = document.getElementById('search-btn');
 const resultsDiv = document.getElementById('results');
 
@@ -69,16 +69,22 @@ function populateStations() {
   const stations = getDownStations(line);
 
   stationA.innerHTML = '';
-  stationB.innerHTML = '';
-
   stations.forEach((s, i) => {
     stationA.appendChild(new Option(s, i));
-    stationB.appendChild(new Option(s, i));
   });
-
-  // Default: first and last station
   stationA.value = 0;
-  stationB.value = stations.length - 1;
+}
+
+function populateReturnLimit() {
+  returnLimitSelect.innerHTML = '';
+  for (let h = 10; h <= 21; h++) {
+    for (const m of ['00', '30']) {
+      const label = `${h}:${m}`;
+      returnLimitSelect.appendChild(new Option(label, label));
+    }
+  }
+  // Default: 17:00
+  returnLimitSelect.value = '17:00';
 }
 
 lineSelect.addEventListener('change', () => {
@@ -88,15 +94,12 @@ lineSelect.addEventListener('change', () => {
 
 // --- Search Logic ---
 
-function findOutboundTrains(line, fromIdx, toIdx) {
-  // A is before B in station order → use down timetable
-  // A is after B → use up timetable
+function findTrains(line, fromIdx, toIdx) {
   const goingDown = fromIdx < toIdx;
   const data = timetableData[line][goingDown ? 'down' : 'up'];
   const stations = data.stations;
   const downStations = getDownStations(line);
 
-  // Map the station indices (which are in down-line order) to the timetable's station order
   const fromStation = downStations[fromIdx];
   const toStation = downStations[toIdx];
   const ttFromIdx = stations.indexOf(fromStation);
@@ -119,99 +122,63 @@ function findOutboundTrains(line, fromIdx, toIdx) {
       });
     }
   }
-
-  return results.sort((a, b) => a.depMinutes - b.depMinutes);
-}
-
-function findReturnTrains(line, fromIdx, toIdx) {
-  // Return trip: B → A
-  // If B is after A in down order, return is up direction
-  const goingUp = fromIdx > toIdx;
-  const data = timetableData[line][goingUp ? 'up' : 'down'];
-  const stations = data.stations;
-  const downStations = getDownStations(line);
-
-  const fromStation = downStations[fromIdx]; // B station
-  const toStation = downStations[toIdx];     // A station
-  const ttFromIdx = stations.indexOf(fromStation);
-  const ttToIdx = stations.indexOf(toStation);
-
-  if (ttFromIdx === -1 || ttToIdx === -1 || ttFromIdx >= ttToIdx) return [];
-
-  const results = [];
-  for (const train of data.trains) {
-    const depTime = train.times[ttFromIdx];
-    const arrTime = train.times[ttToIdx];
-    if (depTime && arrTime) {
-      results.push({
-        trainNumber: train.trainNumber,
-        type: train.type,
-        depTime,
-        arrTime,
-        depMinutes: timeToMinutes(depTime),
-        arrMinutes: timeToMinutes(arrTime)
-      });
-    }
-  }
-
   return results.sort((a, b) => a.depMinutes - b.depMinutes);
 }
 
 function searchRoundTrips() {
   const line = lineSelect.value;
   const aIdx = parseInt(stationA.value);
-  const bIdx = parseInt(stationB.value);
-  const minStay = parseInt(minStayInput.value) || 0;
-
-  if (aIdx === bIdx) {
-    resultsDiv.innerHTML = '<p class="no-results">出発駅と目的駅が同じです。</p>';
-    return;
-  }
-
+  const limitMinutes = timeToMinutes(returnLimitSelect.value);
+  const nowMinutes = getNowMinutes();
   const downStations = getDownStations(line);
   const aName = downStations[aIdx];
-  const bName = downStations[bIdx];
 
-  const outbound = findOutboundTrains(line, aIdx, bIdx);
-  const returnTrips = findReturnTrains(line, bIdx, aIdx);
-
-  if (outbound.length === 0) {
-    resultsDiv.innerHTML = `<p class="no-results">${aName} → ${bName} の列車が見つかりません。</p>`;
-    return;
+  // Build candidate B stations sorted by distance from A (farthest first)
+  const bCandidates = [];
+  for (let i = 0; i < downStations.length; i++) {
+    if (i === aIdx) continue;
+    bCandidates.push({ idx: i, distance: Math.abs(i - aIdx) });
   }
+  bCandidates.sort((a, b) => b.distance - a.distance);
 
-  if (returnTrips.length === 0) {
-    resultsDiv.innerHTML = `<p class="no-results">${bName} → ${aName} の帰りの列車が見つかりません。</p>`;
-    return;
-  }
-
-  const nowMinutes = getNowMinutes();
   const patterns = [];
 
-  for (const out of outbound) {
-    if (out.depMinutes < nowMinutes) continue;
+  for (const { idx: bIdx } of bCandidates) {
+    const bName = downStations[bIdx];
+    const outbound = findTrains(line, aIdx, bIdx);
+    const returnTrips = findTrains(line, bIdx, aIdx);
 
-    for (const ret of returnTrips) {
-      const stayMinutes = ret.depMinutes - out.arrMinutes;
-      if (stayMinutes < minStay) continue;
+    for (const out of outbound) {
+      if (out.depMinutes < nowMinutes) continue;
 
-      const totalMinutes = ret.arrMinutes - out.depMinutes;
-      if (totalMinutes <= 0) continue;
+      for (const ret of returnTrips) {
+        const stayMinutes = ret.depMinutes - out.arrMinutes;
+        if (stayMinutes < MIN_STAY) continue;
 
-      patterns.push({ out, ret, stayMinutes, totalMinutes });
+        if (ret.arrMinutes > limitMinutes) continue;
+
+        const totalMinutes = ret.arrMinutes - out.depMinutes;
+        if (totalMinutes <= 0) continue;
+
+        patterns.push({
+          out, ret, stayMinutes, totalMinutes,
+          bName,
+          distance: Math.abs(bIdx - aIdx)
+        });
+      }
     }
   }
 
   if (patterns.length === 0) {
-    resultsDiv.innerHTML = `<p class="no-results">条件に合う往復パターンが見つかりません。最低滞在時間を短くしてみてください。</p>`;
+    resultsDiv.innerHTML = '<p class="no-results">条件に合う往復パターンが見つかりません。帰着リミットを遅くしてみてください。</p>';
     return;
   }
 
-  // Sort by outbound departure, then by stay time
-  patterns.sort((a, b) => a.out.depMinutes - b.out.depMinutes || a.stayMinutes - b.stayMinutes);
+  // Sort: farthest destination first, then earliest departure
+  patterns.sort((a, b) => b.distance - a.distance || a.out.depMinutes - b.out.depMinutes);
 
   const nowStr = minutesToTime(nowMinutes);
-  let html = `<div class="result-summary">${aName} ⇄ ${bName}：${patterns.length}件の往復パターン（${nowStr}以降）</div>`;
+  let html = `<div class="result-summary">${aName}発 → ${returnLimitSelect.value}までに帰着：${patterns.length}件（${nowStr}以降）</div>`;
 
   patterns.forEach((p, i) => {
     const stayH = Math.floor(p.stayMinutes / 60);
@@ -224,7 +191,7 @@ function searchRoundTrips() {
 
     html += `
       <div class="result-card">
-        <div class="pattern-number">パターン ${i + 1}</div>
+        <div class="pattern-number">パターン ${i + 1}　─　${p.bName}まで</div>
         <div class="trip-section">
           <span class="time">${p.out.depTime}</span>
           <span class="station">${aName} 発</span>
@@ -233,12 +200,12 @@ function searchRoundTrips() {
         <div class="separator">↓</div>
         <div class="trip-section">
           <span class="time">${p.out.arrTime}</span>
-          <span class="station">${bName} 着</span>
+          <span class="station">${p.bName} 着</span>
         </div>
-        <div class="stay-info">${bName}で ${stayStr} 滞在</div>
+        <div class="stay-info">${p.bName}で ${stayStr} 滞在</div>
         <div class="trip-section">
           <span class="time">${p.ret.depTime}</span>
-          <span class="station">${bName} 発</span>
+          <span class="station">${p.bName} 発</span>
           <span class="train-info">${p.ret.type} ${p.ret.trainNumber}</span>
         </div>
         <div class="separator">↓</div>
@@ -260,4 +227,5 @@ searchBtn.addEventListener('click', searchRoundTrips);
 
 loadAllData().then(() => {
   populateStations();
+  populateReturnLimit();
 });

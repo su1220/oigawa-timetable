@@ -53,7 +53,7 @@ main {
   color: #555;
 }
 
-select, input[type="number"] {
+select {
   width: 100%;
   padding: 0.6rem;
   font-size: 1rem;
@@ -61,23 +61,6 @@ select, input[type="number"] {
   border-radius: 6px;
   background: #fff;
   appearance: auto;
-}
-
-.station-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-}
-
-.station-row .form-group {
-  flex: 1;
-}
-
-.station-row .arrow {
-  font-size: 1.4rem;
-  padding-bottom: 0.7rem;
-  color: #2e7d32;
-  flex-shrink: 0;
 }
 
 #search-btn {
